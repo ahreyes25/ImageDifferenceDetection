@@ -7,11 +7,9 @@ from sklearn.cluster import KMeans
 if __name__ == "__main__":
 	pic1 = str(sys.argv[1])
 	pic2 = str(sys.argv[2])
-	
-nClusters = 5
-# - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	nClusters = int(sys.argv[3])
 
-# find difference between to images and
+# find difference between two images and
 # store that as a new image file
 img1 = cv2.imread(pic1)
 img2 = cv2.imread(pic2)
@@ -57,23 +55,47 @@ for i in range(nClusters):
 						right = points[j]
 
 	# get x radius of ellipse
-	pdx = abs(left[0] - right[0])
-	pdy = abs(left[1] - right[1])
-	pd = math.sqrt(math.pow(pdx, 2) + math.pow(pdy, 2)) - 30
+	dx = abs(left[0] - right[0])
+	dy = abs(left[1] - right[1])
+	rx = math.sqrt(math.pow(dx, 2) + math.pow(dy, 2)) - 30
 
-	# get angle between the two points in degress
-	angle = math.degrees(math.atan2(pdy, pdx))
+	# get angle between left and right points in degress
+	angle = math.degrees(math.atan2(dy, dx))
 
-	# adjustments????
+	# angle adjustments
 	if right[1] < left[1]:
 		angle += 135
+
+	# get ry
+	# iterate through every point, and compare its
+	# angle in relation to the center point. Find the 
+	# two furthest points on the line that is
+	# perpendicular to the angle created from the left
+	# and right points. Measure this distance to get ry.
+	for j in range(len(points)):
+		if kmeans.labels_[j] == i:
+			tx = points[j][0] # point x
+			ty = points[j][1] # point y
+			cx = kmeans.cluster_centers_[i][0] # center x
+			cy = kmeans.cluster_centers_[i][1] # center y
+			dx = abs(tx - cx) # distance between x coordinates
+			dy = abs(ty - cy) # distance between y coordinates
+			an = math.floor(math.degrees(math.atan2(dy, dx))) # angle
+			
+			perpAn = math.floor(math.floor(angle) - an)
+			print(str(perpAn) + "\n" + str(math.floor(angle)) + "\n")
+			if perpAn % 90 <= 10: #and abs(perpAn - angle) > 10:
+				cv2.line(imgDif, (math.floor(tx), math.floor(ty)), (math.floor(cx), math.floor(cy)), (255, 255, 255), 1)
+
+	ry = 40;
 	
 	# draw ellipse
 	cv2.ellipse(imgDif, (math.floor(kmeans.cluster_centers_[i][0]), math.floor(kmeans.cluster_centers_[i][1])),
-		(math.floor(pd), 30), angle, 0, 360, (255, 255, 255), 2)
+		(math.floor(rx), math.floor(ry)), angle, 0, 360, (255, 255, 255), 2)
 
-
-
+# output JSON data
+# check for solutions JSON file to append
+# to, if not exists, create one.
 
 
 cv2.imshow('imgDif', imgDif)
