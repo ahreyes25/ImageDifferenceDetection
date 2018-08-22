@@ -1,10 +1,11 @@
 import cv2
+import math
 import numpy as np
 from sklearn.cluster import KMeans
 
 # Change these to be entered in terminal before runtime
-pic1 = 'girl1.jpg' 
-pic2 = 'girl2.jpg'
+pic1 = 'cook1.jpg' 
+pic2 = 'cook2.jpg'
 nClusters = 5
 # - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -53,8 +54,23 @@ for i in range(nClusters):
 					if points[j][0] > right[0]:
 						right = points[j]
 
-	# get angle between two points
+	# get euclidean distance between two edge points
+	pdx = abs(left[0] - right[0])
+	pdy = abs(left[1] - right[1])
+	pd = math.sqrt(math.pow(pdx, 2) + math.pow(pdy, 2)) - 30
+
+	# get angle between the two points in degress
+	angle = math.degrees(math.atan2(pdy, pdx))
+
+	# adjustments????
+	if right[1] < left[1]:
+		angle += 135
 	
+	# draw ellipse
+	cv2.ellipse(imgDif, (math.floor(kmeans.cluster_centers_[i][0]), math.floor(kmeans.cluster_centers_[i][1])),
+		(math.floor(pd), 30), angle, 0, 360, (255, 255, 255), 2)
+
+
 
 
 
