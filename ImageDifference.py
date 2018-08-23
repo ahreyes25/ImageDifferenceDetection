@@ -2,6 +2,7 @@ import cv2
 import math
 import numpy as np
 import sys
+import json
 from sklearn.cluster import KMeans
 
 if __name__ == "__main__":
@@ -34,8 +35,8 @@ kmeans.fit(points)
 # Iterate through each point in the cluster, 
 # and estimate an elipse that covers the 
 # cluster
+data = list()
 for i in range(nClusters):
-	# get edge points
 	left = None
 	right = None
 	up = None
@@ -72,77 +73,59 @@ for i in range(nClusters):
 					if points[j][1] > down[1]:
 						down = points[j]
 
-	tl = (left[0], up[1])
-	tr = (right[0], up[1])
-	bl = (left[0], down[1])
-	br = (right[0], down[1])
+	tl = (left[0], up[1]) # top left point
+	tr = (right[0], up[1]) # top right point
+	bl = (left[0], down[1]) # bottom left point
+	br = (right[0], down[1]) # bottom right point
 
-	cv2.line(imgDif, (math.floor(tl[0]), math.floor(tl[1])),
-		(math.floor(tr[0]), math.floor(tr[1])), (255, 255, 255), 4)
+	haxis = ((tl[0], (tl[1] + bl[1]) / 2), (tr[0], (tr[1] + br[1]) / 2))
+	vaxis = (((tl[0] + tr[0]) / 2, tl[1]), ((bl[0] + br[0]) / 2, bl[1]))
 
-	cv2.line(imgDif, (math.floor(tr[0]), math.floor(tr[1])),
-		(math.floor(br[0]), math.floor(br[1])), (255, 255, 255), 4)
+	cluster = {
+	'id': i,
+	'centerx': math.floor(kmeans.cluster_centers_[i][0]),
+	'centery': math.floor(kmeans.cluster_centers_[i][1]), 
+	'tlx': tl[0],
+	'tly': tl[1],
+	'trx': tr[0],
+	'try': tr[1],
+	'blx': bl[0],
+	'bly': bl[1],
+	'brx': br[0],
+	'bry': br[1],
+	'hax1x': haxis[0][0],
+	'hax1y': haxis[0][1],
+	'hax2x': haxis[1][0],
+	'hax2y': haxis[1][1],
+	'vax1x': vaxis[0][0],
+	'vax1y': vaxis[0][1],
+	'vax2x': vaxis[1][0],
+	'vax2y': vaxis[1][1],
+	}
+	data.append(cluster)
 
-	cv2.line(imgDif, (math.floor(br[0]), math.floor(br[1])),
-		(math.floor(bl[0]), math.floor(bl[1])), (255, 255, 255), 4)
+with open('./clusterData.json', 'w') as file:
+	json.dump(data, file)
 
-	cv2.line(imgDif, (math.floor(bl[0]), math.floor(bl[1])),
-		(math.floor(tl[0]), math.floor(tl[1])), (255, 255, 255), 4)
+	# draw borders
+	#cv2.line(imgDif, (math.floor(tl[0]), math.floor(tl[1])),
+	#	(math.floor(tr[0]), math.floor(tr[1])), (255, 255, 255), 4)
 
-	# if right is higher than left, average
-	# with up point, recalculate
-	#if right[1] < left[1]:
-	#	right = ((right[0] + up[0]) / 2, (right[1] + up[1]) / 2)
-	#	left = ((left[0] + down[0]) / 2, (left[1] + down[1]) / 2)
+	#cv2.line(imgDif, (math.floor(tr[0]), math.floor(tr[1])),
+	#	(math.floor(br[0]), math.floor(br[1])), (255, 255, 255), 4)
 
-	# if left is higher than right, average
-	# with down point, recalculate
-	#elif right[1] > left[1]:
-	#	right = ((right[0] + down[0]) / 2, (right[1] + down[1]) / 2)
-	#	left = ((left[0] + up[0]) / 2, (left[1] + up[1]) / 2)
+	#cv2.line(imgDif, (math.floor(br[0]), math.floor(br[1])),
+	#	(math.floor(bl[0]), math.floor(bl[1])), (255, 255, 255), 4)
 
-	# get x radius of ellipse
-	#dx = abs(left[0] - right[0])
-	#dy = abs(left[1] - right[1])
-	#rx = math.sqrt(math.pow(dx, 2) + math.pow(dy, 2)) - 20
+	#cv2.line(imgDif, (math.floor(bl[0]), math.floor(bl[1])),
+	#	(math.floor(tl[0]), math.floor(tl[1])), (255, 255, 255), 4)
 
-	# get angle between left and right
-	# points in degress
-	#angle = math.degrees(math.atan2(dy, dx))
+	# draw axis
+	#cv2.line(imgDif, (math.floor(haxis[0][0]), math.floor(haxis[0][1])),
+	#	(math.floor(haxis[1][0]), math.floor(haxis[1][1])), (255, 255, 255), 4)
 
-	# angle adjustments
-	#if right[1] < left[1]:
-	#	angle -= 45
-
-	# get ry
-	# find all points on the verticle axis
-	# and find the distance between the
-	# edges and then tilt that distance 
-	# by a complementary angle to the theta
-	#dy = 0
-	#p = None
-	#for j in range(len(points)):
-	#	if kmeans.labels_[j] == i:
-	#		if math.floor(points[j][0]) == math.floor(kmeans.cluster_centers_[i][0]): 
-	#			if (abs(kmeans.cluster_centers_[i][1] - points[j][1]) > dy):
-	#				dy = abs(kmeans.cluster_centers_[i][1] - points[j][1])
-	#				p = points[j]
-
-	#theta = angle
-	#ry = (dy / math.cos(theta))
-	#ry = 30
-	
-	#cv2.line(imgDif, (math.floor(right[0]), math.floor(right[1])),
-	#	(math.floor(left[0]), math.floor(left[1])), (255, 255, 255), 4)
-
-	# draw ellipse
-	#cv2.ellipse(imgDif, (math.floor(kmeans.cluster_centers_[i][0]), math.floor(kmeans.cluster_centers_[i][1])),
-	#	(math.floor(abs(rx)), math.floor(abs(ry))), angle, 0, 360, (255, 255, 255), 2)
-
-# output JSON data
-# check for solutions JSON file to append
-# to, if not exists, create one.
-
+	#cv2.line(imgDif, (math.floor(vaxis[0][0]), math.floor(vaxis[0][1])),
+	#	(math.floor(vaxis[1][0]), math.floor(vaxis[1][1])), (255, 255, 255), 4)
 
 cv2.imshow('imgDif', imgDif)
 cv2.waitKey(0)
