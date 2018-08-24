@@ -1,6 +1,5 @@
 import cv2
 import math
-import numpy as np
 import sys
 import json
 from sklearn.cluster import KMeans
