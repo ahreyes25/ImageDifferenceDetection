@@ -85,7 +85,8 @@ for i in range(nClusters):
 
 	# JSON data collection for output
 	cluster = {
-	'id': i,
+	'pic': pic1,
+	'cluster': i,
 	'centerx': math.floor(kmeans.cluster_centers_[i][0]),
 	'centery': math.floor(kmeans.cluster_centers_[i][1]), 
 	'tlx': tl[0], 'tly': tl[1],
@@ -101,30 +102,30 @@ for i in range(nClusters):
 
 	if show == 1:
 		# draw axis
-		cv2.line(imgDif, (math.floor(haxis[0][0]), math.floor(haxis[0][1])),
-			(math.floor(haxis[1][0]), math.floor(haxis[1][1])), (100, 100, 100), 4)
+		#cv2.line(img1, (math.floor(haxis[0][0]), math.floor(haxis[0][1])),
+		#	(math.floor(haxis[1][0]), math.floor(haxis[1][1])), (255, 255, 255), 4)
 
-		cv2.line(imgDif, (math.floor(vaxis[0][0]), math.floor(vaxis[0][1])),
-			(math.floor(vaxis[1][0]), math.floor(vaxis[1][1])), (100, 100, 100), 4)
+		#cv2.line(img1, (math.floor(vaxis[0][0]), math.floor(vaxis[0][1])),
+		#	(math.floor(vaxis[1][0]), math.floor(vaxis[1][1])), (255, 255, 255), 4)
 
 		# draw borders
-		cv2.line(imgDif, (math.floor(tl[0]), math.floor(tl[1])),
-			(math.floor(tr[0]), math.floor(tr[1])), (255, 255, 255), 4)
+		cv2.line(img1, (math.floor(tl[0]), math.floor(tl[1])),
+			(math.floor(tr[0]), math.floor(tr[1])), (0, 0, 255), 4)
 
-		cv2.line(imgDif, (math.floor(tr[0]), math.floor(tr[1])),
-			(math.floor(br[0]), math.floor(br[1])), (255, 255, 255), 4)
+		cv2.line(img1, (math.floor(tr[0]), math.floor(tr[1])),
+			(math.floor(br[0]), math.floor(br[1])), (0, 0, 255), 4)
 
-		cv2.line(imgDif, (math.floor(br[0]), math.floor(br[1])),
-			(math.floor(bl[0]), math.floor(bl[1])), (255, 255, 255), 4)
+		cv2.line(img1, (math.floor(br[0]), math.floor(br[1])),
+			(math.floor(bl[0]), math.floor(bl[1])), (0, 0, 255), 4)
 
-		cv2.line(imgDif, (math.floor(bl[0]), math.floor(bl[1])),
-			(math.floor(tl[0]), math.floor(tl[1])), (255, 255, 255), 4)
+		cv2.line(img1, (math.floor(bl[0]), math.floor(bl[1])),
+			(math.floor(tl[0]), math.floor(tl[1])), (0, 0, 255), 4)
 
 # write to JSON file
 with open('./clusterData.json', 'w') as file:
 	json.dump(data, file)
 
 if show == 1:
-	cv2.imshow('imgDif', imgDif)
+	cv2.imshow('img1', img1)
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
