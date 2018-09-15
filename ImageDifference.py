@@ -33,12 +33,21 @@ for x in range(0, width):
 kmeans = KMeans(n_clusters=nClusters)
 kmeans.fit(points)
 
+# Check old JSON first to get size - aka: current game level
+if os.path.exists('./clusterData.json'):
+	with open('./clusterData.json') as file:
+		oldData = json.load(file)
+	currentLevel = len(oldData)
+else:
+	currentLevel = 0
+
+# Create dictionary object to hold JSON
+data = {}
+data['level_' + str(currentLevel)] = {}
+
 # Iterate through each point in the cluster, 
 # and estimate an elipse that covers the 
 # cluster
-data = {}
-data[str(pic1)] = {}
-
 for i in range(nClusters):
 	left = None
 	right = None
@@ -86,7 +95,7 @@ for i in range(nClusters):
 	vaxis = (((tl[0] + tr[0]) / 2, tl[1]), ((bl[0] + br[0]) / 2, bl[1]))
 
 	# JSON data collection for output
-	data[str(pic1)]['cluster_' + str(i)] = {
+	data['level_' + str(currentLevel)]['cluster_' + str(i)] = {
 		'center_x': str(math.floor(kmeans.cluster_centers_[i][0])),
 		'center_y': str(math.floor(kmeans.cluster_centers_[i][1])), 
 		'tl_x': str(tl[0]), 'tl_y': str(tl[1]),
@@ -113,7 +122,6 @@ for i in range(nClusters):
 		cv2.line(img1, (math.floor(bl[0]), math.floor(bl[1])),
 			(math.floor(tl[0]), math.floor(tl[1])), (0, 0, 255), 4)
 
-print(data)
 # write to JSON file
 # append to old JSON file
 if os.path.exists('./clusterData.json'):
