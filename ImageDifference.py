@@ -1,6 +1,7 @@
 import cv2
 import math
 import sys
+import os
 import json
 from sklearn.cluster import KMeans
 
@@ -35,7 +36,9 @@ kmeans.fit(points)
 # Iterate through each point in the cluster, 
 # and estimate an elipse that covers the 
 # cluster
-data = list()
+data = {}
+data[str(pic1)] = {}
+
 for i in range(nClusters):
 	left = None
 	right = None
@@ -83,30 +86,20 @@ for i in range(nClusters):
 	vaxis = (((tl[0] + tr[0]) / 2, tl[1]), ((bl[0] + br[0]) / 2, bl[1]))
 
 	# JSON data collection for output
-	cluster = {
-	'pic': pic1,
-	'cluster': i,
-	'centerx': math.floor(kmeans.cluster_centers_[i][0]),
-	'centery': math.floor(kmeans.cluster_centers_[i][1]), 
-	'tlx': tl[0], 'tly': tl[1],
-	'trx': tr[0], 'try': tr[1],
-	'blx': bl[0], 'bly': bl[1],
-	'brx': br[0], 'bry': br[1],
-	'hax1x': haxis[0][0], 'hax1y': haxis[0][1],
-	'hax2x': haxis[1][0], 'hax2y': haxis[1][1],
-	'vax1x': vaxis[0][0], 'vax1y': vaxis[0][1],
-	'vax2x': vaxis[1][0], 'vax2y': vaxis[1][1],
+	data[str(pic1)]['cluster ' + str(i)] = {
+		'centerx': str(math.floor(kmeans.cluster_centers_[i][0])),
+		'centery': str(math.floor(kmeans.cluster_centers_[i][1])), 
+		'tlx': str(tl[0]), 'tly': str(tl[1]),
+		'trx': str(tr[0]), 'try': str(tr[1]),
+		'blx': str(bl[0]), 'bly': str(bl[1]),
+		'brx': str(br[0]), 'bry': str(br[1]),
+		#'hax1x': str(haxis[0][0]), 'hax1y': str(haxis[0][1]),
+		#'hax2x': str(haxis[1][0]), 'hax2y': str(haxis[1][1]),
+		#'vax1x': str(vaxis[0][0]), 'vax1y': str(vaxis[0][1]),
+		#'vax2x': str(vaxis[1][0]), 'vax2y': str(vaxis[1][1]),
 	}
-	data.append(cluster)
 
 	if show == 1:
-		# draw axis
-		#cv2.line(img1, (math.floor(haxis[0][0]), math.floor(haxis[0][1])),
-		#	(math.floor(haxis[1][0]), math.floor(haxis[1][1])), (255, 255, 255), 4)
-
-		#cv2.line(img1, (math.floor(vaxis[0][0]), math.floor(vaxis[0][1])),
-		#	(math.floor(vaxis[1][0]), math.floor(vaxis[1][1])), (255, 255, 255), 4)
-
 		# draw borders
 		cv2.line(img1, (math.floor(tl[0]), math.floor(tl[1])),
 			(math.floor(tr[0]), math.floor(tr[1])), (0, 0, 255), 4)
@@ -120,11 +113,24 @@ for i in range(nClusters):
 		cv2.line(img1, (math.floor(bl[0]), math.floor(bl[1])),
 			(math.floor(tl[0]), math.floor(tl[1])), (0, 0, 255), 4)
 
+print(data)
 # write to JSON file
-with open('./clusterData.json', 'w') as file:
-	json.dump(data, file)
+# append to old JSON file
+if os.path.exists('./clusterData.json'):
+	with open('./clusterData.json') as file:
+		oldData = json.load(file)
+	oldData.update(data)
+
+	with open('./clusterData.json', 'w') as file:
+		json.dump(oldData, file)
+
+# create new JSON file
+else:		
+	with open('./clusterData.json', 'w') as file:
+		json.dump(data, file)
 
 if show == 1:
 	cv2.imshow('img1', img1)
 	cv2.waitKey(0)
+	cv2.imwrite('01.png', imgDif)
 	cv2.destroyAllWindows()
