@@ -86,13 +86,13 @@ for i in range(nClusters):
 	vaxis = (((tl[0] + tr[0]) / 2, tl[1]), ((bl[0] + br[0]) / 2, bl[1]))
 
 	# JSON data collection for output
-	data[str(pic1)]['cluster ' + str(i)] = {
-		'centerx': str(math.floor(kmeans.cluster_centers_[i][0])),
-		'centery': str(math.floor(kmeans.cluster_centers_[i][1])), 
-		'tlx': str(tl[0]), 'tly': str(tl[1]),
-		'trx': str(tr[0]), 'try': str(tr[1]),
-		'blx': str(bl[0]), 'bly': str(bl[1]),
-		'brx': str(br[0]), 'bry': str(br[1]),
+	data[str(pic1)]['cluster_' + str(i)] = {
+		'center_x': str(math.floor(kmeans.cluster_centers_[i][0])),
+		'center_y': str(math.floor(kmeans.cluster_centers_[i][1])), 
+		'tl_x': str(tl[0]), 'tl_y': str(tl[1]),
+		'tr_x': str(tr[0]), 'tr_y': str(tr[1]),
+		'bl_x': str(bl[0]), 'bl_y': str(bl[1]),
+		'br_x': str(br[0]), 'br_y': str(br[1]),
 		#'hax1x': str(haxis[0][0]), 'hax1y': str(haxis[0][1]),
 		#'hax2x': str(haxis[1][0]), 'hax2y': str(haxis[1][1]),
 		#'vax1x': str(vaxis[0][0]), 'vax1y': str(vaxis[0][1]),
