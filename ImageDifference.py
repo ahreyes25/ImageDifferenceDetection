@@ -37,9 +37,9 @@ kmeans.fit(points)
 if os.path.exists('./clusterData.json'):
 	with open('./clusterData.json') as file:
 		oldData = json.load(file)
-	currentLevel = len(oldData)
+	currentLevel = len(oldData) + 1
 else:
-	currentLevel = 0
+	currentLevel = 1
 
 # Create dictionary object to hold JSON
 data = {}
@@ -122,6 +122,10 @@ for i in range(nClusters):
 		cv2.line(img1, (math.floor(bl[0]), math.floor(bl[1])),
 			(math.floor(tl[0]), math.floor(tl[1])), (0, 0, 255), 4)
 
+if width > height:
+	data['level_' + str(currentLevel)]['orientation'] = 'horizontal'
+else:
+	data['level_' + str(currentLevel)]['orientation'] = 'vertical'
 # write to JSON file
 # append to old JSON file
 if os.path.exists('./clusterData.json'):
